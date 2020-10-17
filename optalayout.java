@@ -186,14 +186,15 @@ public class optalayout implements Callable<Integer> {
         @Override
         public Constraint[] defineConstraints(ConstraintFactory cf) {
 
-            return new Constraint[] { areaEquals(cf), areaOverlaps(cf)
-
+            return new Constraint[] { 
+                                        areaEquals(cf), 
+                                        areaOverlaps(cf)
             };
         }
 
         private Constraint areaOverlaps(ConstraintFactory cf) {
             return cf.from(Window.class).join(Window.class).filter((w1, w2) -> w1.getArea().overlaps(w2.getArea()))
-                    .penalize("Window overlaps", HardSoftScore.ONE_HARD);
+                    .penalize("Window overlaps", HardSoftScore.ONE_HARD;
         }
 
         private Constraint areaEquals(ConstraintFactory cf) {
