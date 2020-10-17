@@ -43,7 +43,7 @@ public class optalayout implements Callable<Integer> {
         SolverConfig sc = new SolverConfig().withSolutionClass(Layout.class).withEntityClasses(Window.class)
                 .withScoreDirectorFactory(
                         new ScoreDirectorFactoryConfig().withConstraintProviderClass(LayoutConstraintProvider.class))
-                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(5L));
+                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(2L));
 
         SolverFactory<Layout> factory = SolverFactory.create(sc);
         Solver<Layout> solver = factory.buildSolver();
@@ -95,7 +95,7 @@ public class optalayout implements Callable<Integer> {
                 overlaps = x < other.x + other.w && x + w > other.x && y < other.y + other.h && y + h > other.y;
             }
 
-            System.out.println(this + " overlaps " + (overlaps?"":" not ") + other);
+           // System.out.println(this + " overlaps " + (overlaps?"":" not ") + other);
 
             return overlaps;
         }
