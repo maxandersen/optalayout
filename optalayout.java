@@ -7,7 +7,10 @@
 
 //SOURCES Visualization.java
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
@@ -29,10 +32,13 @@ import org.optaplanner.core.config.solver.termination.TerminationConfig;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 @Command(name = "optalayout", mixinStandardHelpOptions = true, version = "optalayout 0.1", description = "optalayout made with jbang")
 public class optalayout implements Callable<Integer> {
 
+    @Option(names = {"-s", "--seconds"}, defaultValue = "3", description = "Seconds limit")
+    long seconds;
     public static void main(String... args) {
         int exitCode = new CommandLine(new optalayout()).execute(args);
         System.exit(exitCode);
@@ -43,7 +49,7 @@ public class optalayout implements Callable<Integer> {
         SolverConfig sc = new SolverConfig().withSolutionClass(Layout.class).withEntityClasses(Window.class)
                 .withScoreDirectorFactory(
                         new ScoreDirectorFactoryConfig().withConstraintProviderClass(LayoutConstraintProvider.class))
-                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(2L));
+                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(seconds));
 
         SolverFactory<Layout> factory = SolverFactory.create(sc);
         Solver<Layout> solver = factory.buildSolver();
@@ -134,7 +140,7 @@ public class optalayout implements Callable<Integer> {
 
     @PlanningSolution
     public static class Layout {
-        public static final int maxWidth = 1080;
+        public static final int maxWidth = 1280;
         public static final int maxHeight = 720;
 
         @PlanningScore
@@ -147,9 +153,11 @@ public class optalayout implements Callable<Integer> {
             return windows;
         }
 
-        List<Area> split(Area input) {
-            List<Area> results = new ArrayList<>();
-            if (input.w / 2 < 40) {
+        //naive split; can most likely be optimized :)
+        Collection<Area> split(Area input) {
+        
+            Set<Area> results = new HashSet<>();
+            if (input.w / 2 < 100 || input.h / 2 < 100) {
                 return results;
             } else {
                 Area left = new Area(input.x, input.y, input.w / 2, input.h);
@@ -158,6 +166,13 @@ public class optalayout implements Callable<Integer> {
                 results.add(right);
                 results.addAll(split(left));
                 results.addAll(split(right));
+
+                Area top = new Area(input.x, input.y, input.w, input.h / 2);
+                Area bottom = new Area(input.x, input.y + input.h, input.w, input.h / 2);
+                results.add(top);
+                results.add(bottom);
+                results.addAll(split(top));
+                results.addAll(split(bottom));
             }
             return results;
         }
@@ -168,9 +183,20 @@ public class optalayout implements Callable<Integer> {
             List<Area> areas = new ArrayList<>();
             int width = maxWidth, height = maxHeight;
 
-            Area a = new Area(1, 1, width, height);
-            areas.add(a);
-            areas.addAll(split(a));
+
+            //left
+            Area column = new Area(1, 1, width/3, height);
+            areas.add(column);
+            areas.addAll(split(column));
+
+            //middle
+            column = new Area((width/3), 1, (width/3), height);
+            areas.add(column);
+            //no split areas.addAll(split(column));
+
+            column = new Area((width/3)*2, 1, (width/3), height);
+            areas.add(column);
+            areas.addAll(split(column));
 
             return areas;
         }
@@ -188,13 +214,13 @@ public class optalayout implements Callable<Integer> {
 
             return new Constraint[] { 
                                         areaEquals(cf), 
-                                        areaOverlaps(cf)
+                                       areaOverlaps(cf)
             };
         }
 
         private Constraint areaOverlaps(ConstraintFactory cf) {
             return cf.from(Window.class).join(Window.class).filter((w1, w2) -> w1.getArea().overlaps(w2.getArea()))
-                    .penalize("Window overlaps", HardSoftScore.ONE_HARD;
+                    .penalize("Window overlaps", HardSoftScore.ONE_HARD);
         }
 
         private Constraint areaEquals(ConstraintFactory cf) {

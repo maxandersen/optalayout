@@ -62,8 +62,8 @@ public class Visualization extends Application {
 
         StackPane pane = new StackPane(root);
 
-        pane.setMinSize(layout.maxHeight, layout.maxWidth);
-        pane.setMaxSize(layout.maxHeight, layout.maxWidth);
+        pane.setMinSize(layout.maxWidth, layout.maxHeight);
+        pane.setMaxSize(layout.maxWidth, layout.maxHeight);
 
         NumberBinding maxScale = Bindings.min(pane.widthProperty().divide(layout.maxHeight),
                 pane.heightProperty().divide(layout.maxWidth));
@@ -71,7 +71,7 @@ public class Visualization extends Application {
         pane.scaleXProperty().bind(maxScale);
         pane.scaleYProperty().bind(maxScale);
 
-        Scene scene = new Scene(pane, layout.maxHeight, layout.maxWidth);
+        Scene scene = new Scene(pane, layout.maxWidth, layout.maxHeight);
         stage.setScene(scene);
         stage.show();
     }
