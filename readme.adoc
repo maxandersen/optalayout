@@ -4,13 +4,15 @@ POC for using optaplanner to do window layout on large monitor.
 
 To just run this directly do:
 
+install jbang from https://jbang.dev/download and run:
+
 [source,shell]
 ----
-curl -Ls https://sh.jbang.dev | bash -s - https://github.com/maxandersen/optalayout/blob/master/optalayout.java
+jbang https://github.com/maxandersen/optalayout/blob/master/optalayout.java
 ----
 
 
-To do development install jbang from https://jbang.dev/download, clone this repo and do:
+To do development, clone this repo and do:
 
 `jbang edit --editor=code optalayout.java`
 
