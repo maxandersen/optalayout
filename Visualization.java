@@ -24,7 +24,6 @@ public class Visualization extends Application {
         Group root = new Group();
         for (optalayout.Area area : layout.getPossibleAreas()) {
 
-            Region wregion = new Region();
             Rectangle rectangle = new Rectangle(area.x, area.y, area.w, area.h);
             rectangle.setFill(Color.TRANSPARENT);
             rectangle.setStroke(Color.RED);
@@ -37,6 +36,7 @@ public class Visualization extends Application {
             line.setEndX(area.x+area.w);
             line.setEndY(area.y+area.h);
             line.setOpacity(0.2);
+            
             root.getChildren().add(rectangle);
             root.getChildren().add(line);
         }

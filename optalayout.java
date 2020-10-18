@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.IntStream;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
@@ -57,10 +58,11 @@ public class optalayout implements Callable<Integer> {
 
         Layout l = new Layout();
         l.windows.add(new Window("Opera"));
-        l.windows.add(new Window("iTerm2"));
         l.windows.add(new Window("BusyCal"));
         l.windows.add(new Window("PDFPen"));
-
+        IntStream.rangeClosed(1,5).forEach(i -> l.windows.add(new Window("iterm " + i)));
+        IntStream.rangeClosed(1,7).forEach(i -> l.windows.add(new Window("vscode " + i)));
+        
         Layout solution = solver.solve(l);
 
         System.out.println(solution);
