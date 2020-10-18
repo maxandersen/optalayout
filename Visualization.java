@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -21,18 +22,25 @@ public class Visualization extends Application {
     public void start(Stage stage) {
 
         Group root = new Group();
-        Group possibleAreas = new Group();
-        root.getChildren().add(possibleAreas);
         for (optalayout.Area area : layout.getPossibleAreas()) {
+
+            Region wregion = new Region();
             Rectangle rectangle = new Rectangle(area.x, area.y, area.w, area.h);
             rectangle.setFill(Color.TRANSPARENT);
             rectangle.setStroke(Color.RED);
             rectangle.setStrokeWidth(3);
-            possibleAreas.getChildren().add(rectangle);
+            rectangle.setOpacity(0.1);
+            
+            Line line = new Line();
+            line.setStartX(area.x);
+            line.setStartY(area.y);
+            line.setEndX(area.x+area.w);
+            line.setEndY(area.y+area.h);
+            line.setOpacity(0.2);
+            root.getChildren().add(rectangle);
+            root.getChildren().add(line);
         }
 
-        Group windows = new Group();
-        root.getChildren().add(windows);
         for (optalayout.Window window : layout.getWindows()) {
             optalayout.Area a = window.getArea();
             if (a != null) {
@@ -40,20 +48,20 @@ public class Visualization extends Application {
                 Region rectangle = new Region();
                 rectangle.setOpacity(0.1);
                 rectangle.setStyle(
-                        "-fx-background-color: red; -fx-border-style: dashed; -fx-border-width: 5; -fx-border-color: black");
+                        "-fx-background-color: green; -fx-border-style: dashed; -fx-border-width: 5; -fx-border-color: black");
 
                 Text text = new Text(window.getTitle() + "(" + a.w + "," + a.h + ")");
 
                 StackPane sp = new StackPane();
-                sp.setLayoutX(rectangle.getLayoutX());
-                sp.setLayoutY(rectangle.getLayoutY());
+                sp.setLayoutX(a.x);
+                sp.setLayoutY(a.y);
                 sp.setMaxWidth(a.w);
                 sp.setMinWidth(a.w);
                 sp.setMaxHeight(a.h);
                 sp.setMinHeight(a.h);
                 sp.getChildren().addAll(rectangle, text);
 
-                windows.getChildren().add(sp);
+                root.getChildren().add(sp);
 
             } else {
                 System.out.println(window.getTitle() + " not in layout!");

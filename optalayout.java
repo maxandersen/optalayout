@@ -8,6 +8,7 @@
 //SOURCES Visualization.java
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +128,11 @@ public class optalayout implements Callable<Integer> {
             return area;
         }
 
+        int getSize() {
+            if(area==null) return 0;
+            return area.h*area.w;
+        }
+
         @Override
         public String toString() {
             return title + "->" + area;
@@ -168,7 +174,7 @@ public class optalayout implements Callable<Integer> {
                 results.addAll(split(right));
 
                 Area top = new Area(input.x, input.y, input.w, input.h / 2);
-                Area bottom = new Area(input.x, input.y + input.h, input.w, input.h / 2);
+                Area bottom = new Area(input.x, input.y + input.h /2, input.w, input.h / 2);
                 results.add(top);
                 results.add(bottom);
                 results.addAll(split(top));
@@ -198,6 +204,15 @@ public class optalayout implements Callable<Integer> {
             areas.add(column);
             areas.addAll(split(column));
 
+            areas.sort(new Comparator<Area>(){
+
+                @Override
+                public int compare(Area o1, Area o2) {
+                    int s1 = o1.w*o1.h;
+                    int s2 = o2.w*o2.h;
+                    return Integer.compare(s1, s2);
+                }
+            });
             return areas;
         }
 
@@ -213,8 +228,9 @@ public class optalayout implements Callable<Integer> {
         public Constraint[] defineConstraints(ConstraintFactory cf) {
 
             return new Constraint[] { 
-                                        areaEquals(cf), 
-                                       areaOverlaps(cf)
+                                       areaEquals(cf), 
+                                       areaOverlaps(cf),
+                                       areaBiggerIsBetter(cf)
             };
         }
 
@@ -226,6 +242,10 @@ public class optalayout implements Callable<Integer> {
         private Constraint areaEquals(ConstraintFactory cf) {
             return cf.from(Window.class).join(Window.class, Joiners.equal(Window::getArea))
                     .penalize("Window in same area", HardSoftScore.ONE_HARD);
+        }
+
+        private Constraint areaBiggerIsBetter(ConstraintFactory cf) {
+            return cf.from(Window.class).reward("Bigger is better", HardSoftScore.ONE_SOFT, Window::getSize);
         }
     }
 
